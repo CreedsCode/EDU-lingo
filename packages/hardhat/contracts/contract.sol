@@ -28,16 +28,26 @@ contract EduLingo is ReentrancyGuard, Ownable {
 	IERC20 public paymentToken;
 
 	// Events
+	event PaymentProcessed(
+		address indexed student,
+		address indexed teacher,
+		uint256 amount,
+		uint256 platformFeeAmount,
+		string language
+	);
+
 	event UserCreated(
 		address indexed user,
 		string[] languages,
 		string[] certifications
 	);
+
 	event ListingCreated(
 		address indexed creator,
 		bool isTeaching,
 		string language,
-		uint256 rate
+		uint256 rate,
+		uint256 listingId
 	);
 	event ReputationUpdated(address indexed user, uint256 newScore);
 
@@ -93,9 +103,16 @@ contract EduLingo is ReentrancyGuard, Ownable {
 			isActive: true
 		});
 
+		uint256 listingId = userListings[msg.sender].length;
 		userListings[msg.sender].push(newListing);
 
-		emit ListingCreated(msg.sender, _isTeaching, _language, _rate);
+		emit ListingCreated(
+			msg.sender,
+			_isTeaching,
+			_language,
+			_rate,
+			listingId
+		);
 	}
 
 	// Reputation System
@@ -192,5 +209,47 @@ contract EduLingo is ReentrancyGuard, Ownable {
 
 	function updatePaymentToken(address _newToken) external onlyOwner {
 		paymentToken = IERC20(_newToken);
+	}
+
+	function purchaseListing(
+		address _teacher,
+		uint256 _listingId
+	) external nonReentrant {
+		require(users[msg.sender].exists, "Student must have a profile");
+		require(users[_teacher].exists, "Teacher must have a profile");
+		require(
+			_listingId < userListings[_teacher].length,
+			"Invalid listing ID"
+		);
+
+		Listing memory listing = userListings[_teacher][_listingId];
+		require(listing.isActive, "Listing is not active");
+		require(listing.isTeaching, "Listing must be a teaching offer");
+
+		uint256 platformFeeAmount = (listing.rate * platformFee) / 100;
+		uint256 teacherAmount = listing.rate - platformFeeAmount;
+
+		// Transfer teacher's share directly
+		require(
+			paymentToken.transferFrom(msg.sender, _teacher, teacherAmount),
+			"Teacher payment failed"
+		);
+
+		// Transfer platform fee directly
+		require(
+			paymentToken.transferFrom(msg.sender, owner(), platformFeeAmount),
+			"Platform fee transfer failed"
+		);
+
+		// Mark listing as inactive after purchase
+		userListings[_teacher][_listingId].isActive = false;
+
+		emit PaymentProcessed(
+			msg.sender,
+			_teacher,
+			listing.rate,
+			platformFeeAmount,
+			listing.language
+		);
 	}
 }
