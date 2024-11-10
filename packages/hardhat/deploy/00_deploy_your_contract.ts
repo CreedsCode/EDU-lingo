@@ -21,6 +21,7 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   });
 
   // Deploy EduLingo with the token address
+  console.log("Deploying EduLingo with token address:", tokenDeploy.address, " pls fund ser");
   await deploy("EduLingo", {
     from: deployer,
     args: [tokenDeploy.address], // Use the deployed token address instead of zero address
@@ -33,7 +34,7 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   // const eduLingo = await hre.ethers.getContract<Contract>("EduLingo", deployer);
 
   // Mint tokens to owner (deployer) and hardcoded address
-  const INITIAL_SUPPLY = hre.ethers.utils.parseEther("1000000"); // 1 million tokens
+  const INITIAL_SUPPLY = hre.ethers.parseEther("1000000"); // 1 million tokens
 
   await tokenContract.mint(deployer, INITIAL_SUPPLY);
 

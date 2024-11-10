@@ -81,3 +81,18 @@ To know more about its features, check out our [website](https://scaffoldeth.io)
 We welcome contributions to Scaffold-ETH 2!
 
 Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+
+#### deploy result
+
+```
+(base) wsl@Degenerate:~/Development/EDU-lingo$ yarn deploy --network opencampus
+Nothing to compile
+No need to generate any newer typings.
+reusing "MockERC20" at 0x805349Ac5bd0D25d5cE7E34f7bC28FCCA3e6898e
+Deploying EduLingo with token address: 0x805349Ac5bd0D25d5cE7E34f7bC28FCCA3e6898e  pls fund ser
+reusing "EduLingo" at 0xd3ae2CB0217AdC8f4334C7F44f5Ed9E76DBa910F
+✅ Tokens minted to deployer and hardcoded address
+👋 EduLingo deployed with token: 0x805349Ac5bd0D25d5cE7E34f7bC28FCCA3e6898e
+📝 Updated TypeScript contract definition file on ../nextjs/contracts/deployedContracts.ts
+(base) wsl@Degenerate:~/Development/EDU-lingo$
+```
